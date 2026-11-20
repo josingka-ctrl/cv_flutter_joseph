@@ -47,8 +47,13 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Papa Siringi'), findsOneWidget);
+    expect(find.text('Siringi'), findsOneWidget);
     expect(find.text('Père'), findsOneWidget);
+    expect(find.text('Antoinette Kasidika'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Aisha Siringi'), 200);
+    expect(find.text('Aisha Siringi'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Michael Siringi'), 200);
+    expect(find.text('Michael Siringi'), findsOneWidget);
 
     await tester.tap(
       find.descendant(
@@ -58,6 +63,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('josingka@gmail.com'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('GitHub'), 200);
     expect(find.text('GitHub'), findsOneWidget);
   });
 }

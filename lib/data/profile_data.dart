@@ -89,26 +89,26 @@ class ProfileData {
 
   static const family = [
     FamilyMember(
-      name: 'Papa Siringi',
+      name: 'Siringi',
       relation: 'Père',
       note: 'Père de Joseph Siringi, à Goma.',
       photo: 'assets/images/pere.jpg',
     ),
     FamilyMember(
-      name: 'Maman Siringi',
+      name: 'Antoinette Kasidika',
       relation: 'Mère',
       note: 'Mère de Joseph Siringi, à Goma.',
       photo: 'assets/images/mere.jpg',
       alignment: Alignment(-0.78, 0),
     ),
     FamilyMember(
-      name: 'Sœur Siringi',
+      name: 'Aisha Siringi',
       relation: 'Sœur',
       note: 'Sœur de Joseph Siringi.',
       photo: 'assets/images/soeur.jpg',
     ),
     FamilyMember(
-      name: 'Frère Siringi',
+      name: 'Michael Siringi',
       relation: 'Frère',
       note: 'Frère de Joseph Siringi.',
       photo: 'assets/images/frere.jpg',

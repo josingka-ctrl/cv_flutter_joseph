@@ -19,6 +19,25 @@ class CvApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'CV Joseph Siringi',
       theme: buildAppTheme(),
+      builder: (context, child) {
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth <= 520) {
+              return child ?? const SizedBox.shrink();
+            }
+            return ColoredBox(
+              color: AppColors.ink,
+              child: Center(
+                child: SizedBox(
+                  width: 420,
+                  height: constraints.maxHeight,
+                  child: child,
+                ),
+              ),
+            );
+          },
+        );
+      },
       home: const LoginPage(),
     );
   }

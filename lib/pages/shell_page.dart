@@ -1,6 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../api/cv_api.dart';
 import '../data/profile_data.dart';
+import '../models/account.dart';
 import '../theme/app_theme.dart';
 import 'contact_page.dart';
 import 'cv_page.dart';
@@ -8,7 +10,10 @@ import 'family_page.dart';
 import 'login_page.dart';
 
 class ShellPage extends StatefulWidget {
-  const ShellPage({super.key});
+  const ShellPage({super.key, required this.api, required this.account});
+
+  final CvApi api;
+  final Account account;
 
   @override
   State<ShellPage> createState() => _ShellPageState();
@@ -20,7 +25,11 @@ class _ShellPageState extends State<ShellPage> {
 
   static const _titles = ['Mon CV', 'Ma famille', 'Contact'];
 
-  static const _pages = [CvPage(), FamilyPage(), ContactPage()];
+  late final List<Widget> _pages = [
+    const CvPage(),
+    FamilyPage(api: widget.api),
+    const ContactPage(),
+  ];
 
   void _select(int index) {
     setState(() => _index = index);
@@ -29,7 +38,7 @@ class _ShellPageState extends State<ShellPage> {
 
   void _logout() {
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const LoginPage()),
+      MaterialPageRoute(builder: (_) => LoginPage(api: widget.api)),
       (_) => false,
     );
   }
@@ -57,10 +66,10 @@ class _ShellPageState extends State<ShellPage> {
               Container(
                 color: AppColors.forest,
                 padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
+                    const CircleAvatar(
                       radius: 36,
                       backgroundColor: AppColors.gold,
                       child: CircleAvatar(
@@ -68,8 +77,8 @@ class _ShellPageState extends State<ShellPage> {
                         backgroundImage: AssetImage(ProfileData.photo),
                       ),
                     ),
-                    SizedBox(height: 14),
-                    Text(
+                    const SizedBox(height: 14),
+                    const Text(
                       ProfileData.fullName,
                       style: TextStyle(
                         color: AppColors.ivory,
@@ -77,10 +86,10 @@ class _ShellPageState extends State<ShellPage> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
-                      ProfileData.title,
-                      style: TextStyle(color: AppColors.goldSoft),
+                      widget.account.email,
+                      style: const TextStyle(color: AppColors.goldSoft),
                     ),
                   ],
                 ),
@@ -115,7 +124,7 @@ class _ShellPageState extends State<ShellPage> {
           ),
         ),
       ),
-      body: _pages[_index],
+      body: IndexedStack(index: _index, children: _pages),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: _select,

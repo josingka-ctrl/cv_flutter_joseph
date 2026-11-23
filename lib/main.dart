@@ -1,6 +1,8 @@
 import 'package:flutter/semantics.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'api/cv_api.dart';
+import 'api/http_cv_api.dart';
 import 'pages/login_page.dart';
 import 'theme/app_theme.dart';
 
@@ -10,8 +12,17 @@ void main() {
   runApp(const CvApp());
 }
 
-class CvApp extends StatelessWidget {
-  const CvApp({super.key});
+class CvApp extends StatefulWidget {
+  const CvApp({super.key, this.api});
+
+  final CvApi? api;
+
+  @override
+  State<CvApp> createState() => _CvAppState();
+}
+
+class _CvAppState extends State<CvApp> {
+  late final CvApi _api = widget.api ?? HttpCvApi();
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +49,7 @@ class CvApp extends StatelessWidget {
           },
         );
       },
-      home: const LoginPage(),
+      home: LoginPage(api: _api),
     );
   }
 }

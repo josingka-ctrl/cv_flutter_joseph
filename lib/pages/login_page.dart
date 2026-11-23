@@ -1,40 +1,90 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../api/api_exception.dart';
+import '../api/cv_api.dart';
+import '../models/account.dart';
 import '../theme/app_theme.dart';
+import '../widgets/primary_button.dart';
+import 'register_page.dart';
 import 'shell_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({super.key, required this.api});
+
+  final CvApi api;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _idController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _hidePassword = true;
+  bool _busy = false;
   String? _error;
 
   @override
   void dispose() {
-    _idController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  void _submit() {
-    final id = _idController.text.trim();
+  Future<void> _submit() async {
+    final email = _emailController.text.trim();
     final password = _passwordController.text;
-    if (id.isEmpty || password.isEmpty) {
-      setState(() {
-        _error = 'Veuillez remplir l’identifiant et le mot de passe.';
-      });
+    final localError = _validate(email, password);
+    if (localError != null) {
+      setState(() => _error = localError);
       return;
     }
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const ShellPage()),
+
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      final account = await widget.api.login(email: email, password: password);
+      if (!mounted) return;
+      _openApp(account);
+    } on ApiException catch (error) {
+      if (!mounted) return;
+      setState(() => _error = error.details);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  void _openApp(Account account) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => ShellPage(api: widget.api, account: account),
+      ),
+      (_) => false,
     );
+  }
+
+  Future<void> _openRegister() async {
+    final account = await Navigator.of(context).push<Account>(
+      MaterialPageRoute(builder: (_) => RegisterPage(api: widget.api)),
+    );
+    if (!mounted || account == null) return;
+    _openApp(account);
+  }
+
+  String? _validate(String email, String password) {
+    if (email.isEmpty || password.isEmpty) {
+      return 'Veuillez remplir l’email et le mot de passe.';
+    }
+    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email)) {
+      return 'Entrez une adresse email valide.';
+    }
+    return null;
+  }
+
+  void _clearError() {
+    if (_error != null) setState(() => _error = null);
   }
 
   @override
@@ -59,8 +109,9 @@ class _LoginPageState extends State<LoginPage> {
                           backgroundColor: AppColors.gold,
                           child: CircleAvatar(
                             radius: 50,
-                            backgroundImage:
-                                AssetImage('assets/images/joseph.jpg'),
+                            backgroundImage: AssetImage(
+                              'assets/images/joseph.jpg',
+                            ),
                           ),
                         ),
                         SizedBox(height: 16),
@@ -99,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             const SizedBox(height: 4),
                             const Text(
-                              'Entrez votre identifiant pour consulter le parcours, la famille et les coordonnées.',
+                              'La connexion vérifie l’email et le mot de passe dans la base de données.',
                               style: TextStyle(
                                 color: AppColors.muted,
                                 height: 1.35,
@@ -107,22 +158,21 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             const SizedBox(height: 18),
                             TextField(
-                              controller: _idController,
+                              controller: _emailController,
+                              key: const Key('login-email'),
+                              keyboardType: TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
                               autocorrect: false,
                               decoration: const InputDecoration(
-                                labelText: 'Identifiant',
+                                labelText: 'Email',
                                 prefixIcon: Icon(Icons.person_outline),
                               ),
-                              onChanged: (_) {
-                                if (_error != null) {
-                                  setState(() => _error = null);
-                                }
-                              },
+                              onChanged: (_) => _clearError(),
                             ),
                             const SizedBox(height: 14),
                             TextField(
                               controller: _passwordController,
+                              key: const Key('login-password'),
                               obscureText: _hidePassword,
                               textInputAction: TextInputAction.done,
                               onSubmitted: (_) => _submit(),
@@ -145,11 +195,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                               ),
-                              onChanged: (_) {
-                                if (_error != null) {
-                                  setState(() => _error = null);
-                                }
-                              },
+                              onChanged: (_) => _clearError(),
                             ),
                             if (_error != null) ...[
                               const SizedBox(height: 10),
@@ -162,33 +208,15 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                             const SizedBox(height: 18),
-                            FilledButton(
-                              style: FilledButton.styleFrom(
-                                backgroundColor: AppColors.gold,
-                                foregroundColor: AppColors.ink,
-                                minimumSize: const Size.fromHeight(52),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                              ),
+                            PrimaryButton(
+                              label: 'Se connecter',
+                              busy: _busy,
                               onPressed: _submit,
-                              child: const Text(
-                                'Se connecter',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
                             ),
-                            const SizedBox(height: 12),
-                            const Text(
-                              'Démonstration : identifiant joseph, mot de passe siringi.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: AppColors.muted,
-                                fontSize: 12.5,
-                                height: 1.35,
-                              ),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: _busy ? null : _openRegister,
+                              child: const Text('Créer un compte'),
                             ),
                           ],
                         ),

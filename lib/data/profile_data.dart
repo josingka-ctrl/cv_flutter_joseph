@@ -1,5 +1,3 @@
-import 'package:material_ui/material_ui.dart';
-
 class ProfileData {
   static const courtesy = 'Abbé';
   static const name = 'Joseph Siringi';
@@ -59,7 +57,7 @@ class ProfileData {
       place: 'Flutter',
       kind: 'Projet',
       detail:
-          'Application présentant le parcours, la famille et les coordonnées, ouverte par une page de connexion.',
+          'Application présentant le parcours et les coordonnées, avec une connexion réelle et la famille enregistrée dans la base via l’API REST.',
     ),
   ];
 
@@ -87,34 +85,6 @@ class ProfileData {
     'Vie pastorale',
   ];
 
-  static const family = [
-    FamilyMember(
-      name: 'Siringi',
-      relation: 'Père',
-      note: 'Père de Joseph Siringi, à Goma.',
-      photo: 'assets/images/pere.jpg',
-    ),
-    FamilyMember(
-      name: 'Antoinette Kasidika',
-      relation: 'Mère',
-      note: 'Mère de Joseph Siringi, à Goma.',
-      photo: 'assets/images/mere.jpg',
-      alignment: Alignment(-0.78, 0),
-    ),
-    FamilyMember(
-      name: 'Aisha Siringi',
-      relation: 'Sœur',
-      note: 'Sœur de Joseph Siringi.',
-      photo: 'assets/images/soeur.jpg',
-    ),
-    FamilyMember(
-      name: 'Michael Siringi',
-      relation: 'Frère',
-      note: 'Frère de Joseph Siringi.',
-      photo: 'assets/images/frere.jpg',
-      alignment: Alignment(-0.12, -0.08),
-    ),
-  ];
 }
 
 class Formation {
@@ -148,20 +118,4 @@ class LanguageSkill {
 
   final String name;
   final String level;
-}
-
-class FamilyMember {
-  const FamilyMember({
-    required this.name,
-    required this.relation,
-    required this.note,
-    required this.photo,
-    this.alignment = Alignment.center,
-  });
-
-  final String name;
-  final String relation;
-  final String note;
-  final String photo;
-  final Alignment alignment;
 }
